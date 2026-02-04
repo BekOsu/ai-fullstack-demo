@@ -1,11 +1,18 @@
 # AI Fullstack Demo
 
-A simple full-stack application that generates AI-powered text responses. Built with FastAPI and Next.js.
+A full-stack application with user authentication and AI-powered text generation. Built with FastAPI and Next.js.
 
 ## Tech Stack
 
-- **Backend**: Python, FastAPI, OpenAI API
+- **Backend**: Python, FastAPI, SQLAlchemy, JWT Auth, OpenAI API
 - **Frontend**: Next.js, React, TypeScript, Tailwind CSS
+
+## Features
+
+- User registration and login
+- JWT-based authentication
+- Protected user profile page
+- AI text generation via OpenAI
 
 ## Prerequisites
 
@@ -35,6 +42,7 @@ Create a `.env` file:
 
 ```
 OPENAI_API_KEY=your-api-key-here
+JWT_SECRET=your-secret-key-here
 ```
 
 Start the server:
@@ -57,13 +65,31 @@ Frontend runs at http://localhost:3000
 
 ## API Endpoints
 
-| Method | Endpoint        | Description              |
-|--------|-----------------|--------------------------|
-| GET    | `/health`       | Health check             |
-| POST   | `/api/generate` | Generate AI response     |
+| Method | Endpoint         | Description              | Auth Required |
+|--------|------------------|--------------------------|---------------|
+| GET    | `/health`        | Health check             | No            |
+| POST   | `/api/generate`  | Generate AI response     | No            |
+| POST   | `/auth/register` | Create new user          | No            |
+| POST   | `/auth/login`    | Login, get JWT token     | No            |
+| GET    | `/auth/me`       | Get current user profile | Yes           |
 
-### Example Request
+### Example Requests
 
+**Register:**
+```bash
+curl -X POST http://localhost:8000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password123"}'
+```
+
+**Login:**
+```bash
+curl -X POST http://localhost:8000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password123"}'
+```
+
+**Generate AI Response:**
 ```bash
 curl -X POST http://localhost:8000/api/generate \
   -H "Content-Type: application/json" \
@@ -76,12 +102,32 @@ curl -X POST http://localhost:8000/api/generate \
 ├── backend/
 │   ├── main.py              # FastAPI app entry point
 │   ├── config.py            # Environment config
-│   ├── routes/              # API endpoints
-│   ├── schemas/             # Pydantic models
-│   └── services/            # OpenAI integration
+│   ├── database.py          # SQLite connection
+│   ├── models.py            # SQLAlchemy models
+│   ├── routes/
+│   │   ├── health.py        # Health check endpoint
+│   │   ├── ai.py            # AI generation endpoint
+│   │   └── auth.py          # Auth endpoints
+│   ├── schemas/
+│   │   ├── requests.py      # Request models
+│   │   ├── responses.py     # Response models
+│   │   └── auth.py          # Auth models
+│   └── services/
+│       ├── openai_service.py   # OpenAI integration
+│       └── auth_service.py     # JWT & password utils
 └── frontend/
     └── src/
-        ├── app/             # Next.js pages
-        ├── components/      # React components
-        └── lib/             # API utilities
+        ├── app/
+        │   ├── page.tsx        # Home (AI generator)
+        │   ├── login/          # Login page
+        │   ├── register/       # Register page
+        │   └── profile/        # User profile
+        ├── components/
+        │   ├── PromptForm.tsx     # AI prompt input
+        │   ├── ResponseDisplay.tsx # AI response display
+        │   ├── AuthForm.tsx       # Login/register form
+        │   └── Navbar.tsx         # Navigation bar
+        └── lib/
+            ├── api.ts          # Backend API calls
+            └── auth.ts         # Token utilities
 ```
