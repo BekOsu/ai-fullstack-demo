@@ -1,4 +1,4 @@
-iinterface ResponseDisplayProps {
+interface ResponseDisplayProps {
   result: string | null;
   error: string | null;
   isLoading: boolean;
